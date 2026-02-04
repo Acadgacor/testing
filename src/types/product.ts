@@ -12,7 +12,7 @@ export type Product = {
   category: string;
   category_id: number;
   product_type_id: number;
-  usages: number;
+  how_to_use: string;
 };
 
 export type Review = {

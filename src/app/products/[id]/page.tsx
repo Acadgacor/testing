@@ -20,7 +20,7 @@ export default async function ProductDetailPage({ params }: Params) {
   const { data } = await supabase
     .from("products")
     .select(
-      "id,name,price,description,brand,ingredients,skin_type,how_to_use,size,image,concerns,category,tokopedia_url,shopee_url,category_id,product_type_id,usages,rating"
+      "id,name,price,description,brand,ingredients,skin_type,how_to_use,size,image,concerns,category,tokopedia_url,shopee_url,category_id,product_type_id,rating"
     )
     .eq("id", id)
     .maybeSingle();
@@ -46,7 +46,6 @@ export default async function ProductDetailPage({ params }: Params) {
     category: "",
     category_id: 0,
     product_type_id: 0,
-    usages: 0,
     ingredients: [],
     skin_type: [],
     concerns: [],
@@ -66,7 +65,7 @@ export default async function ProductDetailPage({ params }: Params) {
     tokopedia_url?: string | null;
     shopee_url?: string | null;
   } = data
-    ? {
+      ? {
         id: String(data.id),
         name: data.name ?? "Product",
         price: Number(data.price) || 0,
@@ -87,7 +86,7 @@ export default async function ProductDetailPage({ params }: Params) {
         category: data.category ?? "",
         category_id: Number(data.category_id) || 0,
         product_type_id: Number(data.product_type_id) || 0,
-        usages: Number(data.usages) || 0,
+
         description: data.description ?? "",
         ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
         skin_type: Array.isArray(data.skin_type) ? data.skin_type : [],
@@ -97,7 +96,7 @@ export default async function ProductDetailPage({ params }: Params) {
         tokopedia_url: data.tokopedia_url ?? null,
         shopee_url: data.shopee_url ?? null,
       }
-    : fallback;
+      : fallback;
 
   const ingredients: string[] = Array.isArray(product.ingredients) ? product.ingredients : [];
   const skinTypeText = Array.isArray(product.skin_type) ? product.skin_type.join(", ") : String(product.skin_type ?? "All");

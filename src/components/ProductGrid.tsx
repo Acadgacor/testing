@@ -26,7 +26,7 @@ export default function ProductGrid() {
 
         let query = supabase
           .from("products")
-          .select("id,name,price,image,rating,category_id,product_type_id,usages,product_categories(name)");
+          .select("id,name,price,image,rating,category_id,product_type_id,how_to_use,category");
 
         if (category) query = query.eq("category", category);
         if (priceMin !== undefined) query = query.gte("price", priceMin);
@@ -53,10 +53,10 @@ export default function ProductGrid() {
           keyIngredients: Array.isArray(r.keyIngredients) ? r.keyIngredients : [],
           benefits: Array.isArray(r.benefits) ? r.benefits : [],
           size: r.size || "",
-          category: r.product_categories?.name || "",
+          category: r.category || "",
           category_id: Number(r.category_id) || 0,
           product_type_id: Number(r.product_type_id) || 0,
-          usages: Number(r.usages) || 0,
+          how_to_use: r.how_to_use || "",
           ingredients: Array.isArray(r.keyIngredients) ? r.keyIngredients : [],
         }));
         if (active) setItems(list);
