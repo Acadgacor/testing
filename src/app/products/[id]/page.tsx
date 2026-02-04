@@ -71,17 +71,9 @@ export default async function ProductDetailPage({ params }: Params) {
         price: Number(data.price) || 0,
         image: data.image ?? "",
         rating: Number(data.rating ?? 0) || 0,
-        skinType: String(data.skinType ?? data.skin_type ?? ""),
-        keyIngredients: Array.isArray(data.keyIngredients)
-          ? data.keyIngredients
-          : Array.isArray(data.ingredients)
-            ? data.ingredients
-            : [],
-        benefits: Array.isArray(data.benefits)
-          ? data.benefits
-          : Array.isArray(data.concerns)
-            ? data.concerns
-            : [],
+        skinType: String(data.skin_type ?? ""),
+        keyIngredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+        benefits: Array.isArray(data.concerns) ? data.concerns : [],
         size: data.size ?? "",
         category: data.category ?? "",
         category_id: Number(data.category_id) || 0,
