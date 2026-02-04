@@ -158,12 +158,30 @@ export default async function ProductDetailPage({ params }: Params) {
               )}
             </div>
 
-            <div className="mt-10 max-w-lg">
-              <form action={addToCart} className="w-full">
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 max-w-2xl">
+              <form action={addToCart} className="flex-1 min-w-[200px]">
                 <input type="hidden" name="productId" value={product.id} />
                 <input type="hidden" name="qty" value={1} />
                 <Button type="submit" className="w-full text-lg py-4">Add to Cart</Button>
               </form>
+
+              <a
+                href={product.tokopedia_url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#42b549] active:scale-95 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 bg-[#42b549] hover:bg-[#3ca341] flex-1 min-w-[140px]"
+              >
+                Tokopedia
+              </a>
+
+              <a
+                href={product.shopee_url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee4d2d] active:scale-95 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 bg-[#ee4d2d] hover:bg-[#d74425] flex-1 min-w-[140px]"
+              >
+                Shopee
+              </a>
             </div>
           </div>
         </div>

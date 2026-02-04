@@ -13,6 +13,8 @@ export type Product = {
   category_id: number;
   product_type_id: number;
   how_to_use: string;
+  tokopedia_url?: string | null;
+  shopee_url?: string | null;
 };
 
 export type Review = {
