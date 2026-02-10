@@ -10,15 +10,12 @@ export const revalidate = 0;
 export default async function Home() {
   const supabase = await getServerSupabaseRSC();
 
-  // Fetch Featured Products (is_featured = true)
   const { data: featuredProducts } = await supabase
     .from("products")
-    .select("id,name,price,image,category,rating")
+    .select("*")
     .eq("is_featured", true)
     .limit(4);
 
-  // Fetch Best Sellers (original logic using 'featured' column, or general popularity)
-  // Renaming variable for clarity, though keeping original query logic if that's how "Best Sellers" was defined
   const { data: bestSellers } = await supabase
     .from("products")
     .select("id,name,price,image")
@@ -50,7 +47,7 @@ export default async function Home() {
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-brand-dark">Produk Unggulan</h2>
               <p className="mt-2 text-sm text-brand-light">Koleksi istimewa pilihan kami untuk Anda.</p>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
               {featuredItems.map((p: any) => (
                 <ProductCard key={p.id} product={p} />
               ))}
