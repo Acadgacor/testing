@@ -41,9 +41,13 @@ export async function addToCart(formData: FormData) {
   const productId = String(formData.get("productId"));
   const qty = Math.max(1, Number(formData.get("qty") ?? 1)); // Validate qty >= 1
 
+  console.log("addToCart Action Called", { productId, qty });
+
   const supabase = await getServerSupabase();
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes?.user;
+
+  console.log("Current User:", user?.id || "Guest");
 
   // Refactored: We allow guest users now (user might be undefined)
   // if (!user) return; 

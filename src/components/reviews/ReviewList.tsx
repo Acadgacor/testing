@@ -28,14 +28,6 @@ function StarRow({ value }: { value: number }) {
   );
 }
 
-function maskName(email?: string | null) {
-  if (!email) return "User";
-  const [name] = email.split("@");
-  if (!name) return "User";
-  if (name.length <= 2) return `${name}***`;
-  return `${name.slice(0, 2)}***`;
-}
-
 export default async function ReviewList({ productId }: { productId: string }) {
   const supabase = await getServerSupabaseRSC();
   const { data: reviewsData, error: reviewsError } = await supabase
@@ -56,12 +48,12 @@ export default async function ReviewList({ productId }: { productId: string }) {
 
   // Fetch users manually since the FK join might be missing or broken
   const userIds = Array.from(new Set(reviews.map((r) => r.user_id).filter(Boolean)));
-  let usersMap: Record<string, { full_name?: string | null; email?: string | null }> = {};
+  let usersMap: Record<string, { full_name?: string | null; avatar_url?: string | null }> = {};
 
   if (userIds.length > 0) {
     const { data: usersData } = await supabase
       .from("users")
-      .select("id, full_name, email")
+      .select("id, full_name, avatar_url")
       .in("id", userIds);
 
     if (usersData) {
@@ -70,29 +62,37 @@ export default async function ReviewList({ productId }: { productId: string }) {
       });
     }
   }
-  const { data: { user: currentUser } } = await supabase.auth.getUser();
 
   return (
     <div className="space-y-4">
       {reviews.map((r) => {
-        let name = "User";
+        const user = usersMap[r.user_id];
+        const name = user?.full_name || "User";
+        const avatarUrl = user?.avatar_url;
 
-        if (currentUser && r.user_id === currentUser.id) {
-          const meta = currentUser.user_metadata;
-          name = meta.full_name || meta.name || currentUser.email || "User";
-        } else {
-          const user = usersMap[r.user_id];
-          name = user?.full_name || maskName(user?.email) || "User";
-        }
+        // Generate initials
+        const initials = name
+          .split(" ")
+          .map((n) => n[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase();
 
         const ratingVal = Number(r.rating || 0);
-        const date = new Date(r.created_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+        const date = new Date(r.created_at).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+
         return (
           <div key={r.id} className="rounded-2xl border border-neutral-200 bg-white p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-semibold text-brand-dark">{name}</div>
-                <div className="text-xs text-brand-light">{date}</div>
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-brand-dark">{name}</div>
+                  <div className="text-xs text-brand-light">{date}</div>
+                </div>
               </div>
               <StarRow value={ratingVal} />
             </div>

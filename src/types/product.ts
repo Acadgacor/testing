@@ -28,6 +28,23 @@ export type Review = {
   // Penting! Ini untuk menampung data join dari tabel users
   user?: {
     full_name?: string | null;
+    avatar_url?: string | null;
     email?: string | null;
   } | null;
+};
+
+export type Cart = {
+  id: string;
+  user_id: string | null;
+  status: 'active' | 'completed' | 'abandoned';
+  created_at: string;
+};
+
+export type CartItem = {
+  id: string;
+  cart_id: string;
+  product_id: string;
+  quantity: number;
+  created_at?: string;
+  product?: Product;
 };

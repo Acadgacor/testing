@@ -2,11 +2,10 @@ import { Suspense } from "react";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Rating from "@/components/ui/Rating";
-import { addToCart } from "@/actions/cart";
+import AddToCartButton from "@/components/AddToCartButton";
 import ReviewForm from "@/components/reviews/ReviewForm";
 import ReviewList from "@/components/reviews/ReviewList";
 import type { Product } from "@/types/product";
@@ -137,20 +136,11 @@ export default async function ProductDetailPage({ params }: Params) {
                 </div>
               )}
             </div>
-
             {/* Action Buttons - Fixed Bottom on Mobile */}
             <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/80 backdrop-blur-md border-t border-neutral-100 flex items-center gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] sm:static sm:z-auto sm:p-0 sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:shadow-none sm:mt-8 sm:flex-row sm:w-full sm:max-w-lg">
-              <form action={addToCart} className="flex-none">
-                <input type="hidden" name="productId" value={product.id} />
-                <input type="hidden" name="qty" value={1} />
-                <Button
-                  type="submit"
-                  className="h-12 w-12 rounded-full p-0 flex items-center justify-center bg-brand-primary text-white shadow-md active:scale-95 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 sm:h-20 sm:w-20"
-                  aria-label="Add to cart"
-                >
-                  <CartIcon className="h-8 w-8 sm:h-10 sm:w-10" />
-                </Button>
-              </form>
+              <div className="flex-none">
+                <AddToCartButton product={product} />
+              </div>
 
               <div className="flex flex-1 gap-3 sm:flex-none sm:gap-4">
                 <a
@@ -200,15 +190,5 @@ export default async function ProductDetailPage({ params }: Params) {
         </div>
       </div>
     </section>
-  );
-}
-
-function CartIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </svg>
   );
 }
