@@ -25,15 +25,36 @@ export async function submitReview(_prevState: any, formData: FormData) {
 
   const { productId, rating, comment } = parsed.data;
 
-  const { error } = await supabase.from("reviews").upsert(
-    {
+  // Check if review exists
+  const { data: existingReview } = await supabase
+    .from("reviews")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("product_id", productId)
+    .single();
+
+  let error;
+
+  if (existingReview) {
+    // Update existing review
+    const { error: updateError } = await supabase
+      .from("reviews")
+      .update({
+        rating: Number(rating),
+        comment,
+      })
+      .eq("id", existingReview.id);
+    error = updateError;
+  } else {
+    // Insert new review
+    const { error: insertError } = await supabase.from("reviews").insert({
       user_id: user.id,
       product_id: productId,
       rating: Number(rating),
       comment,
-    },
-    { onConflict: "user_id, product_id" }
-  );
+    });
+    error = insertError;
+  }
 
   if (error) {
     return { error: error.message };

@@ -38,25 +38,44 @@ function maskName(email?: string | null) {
 
 export default async function ReviewList({ productId }: { productId: string }) {
   const supabase = await getServerSupabaseRSC();
-  const { data, error } = await supabase
+  const { data: reviewsData, error: reviewsError } = await supabase
     .from("reviews")
-    .select("*, user:user_id(full_name,email)")
+    .select("*")
     .eq("product_id", productId)
     .order("created_at", { ascending: false });
 
-  if (error) {
+  if (reviewsError) {
+    console.error("Error loading reviews:", reviewsError);
     return <div className="text-sm text-red-600">Failed to load reviews.</div>;
   }
 
-  const reviews = (data || []) as Review[];
+  const reviews = (reviewsData || []) as Review[];
   if (reviews.length === 0) {
     return <div className="text-sm text-brand-light">No reviews yet. Be the first to review!</div>;
+  }
+
+  // Fetch users manually since the FK join might be missing or broken
+  const userIds = Array.from(new Set(reviews.map((r) => r.user_id).filter(Boolean)));
+  let usersMap: Record<string, { full_name?: string | null; email?: string | null }> = {};
+
+  if (userIds.length > 0) {
+    const { data: usersData } = await supabase
+      .from("users")
+      .select("id, full_name, email")
+      .in("id", userIds);
+
+    if (usersData) {
+      usersData.forEach((u) => {
+        usersMap[u.id] = u;
+      });
+    }
   }
 
   return (
     <div className="space-y-4">
       {reviews.map((r) => {
-        const name = r.user?.full_name || maskName(r.user?.email) || "User";
+        const user = usersMap[r.user_id];
+        const name = user?.full_name || maskName(user?.email) || "User";
         const ratingVal = Number(r.rating || 0);
         const date = new Date(r.created_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
         return (

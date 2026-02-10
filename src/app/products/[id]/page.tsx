@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -14,6 +15,13 @@ type Params = { params: Promise<{ id: string }> };
 
 export default async function ProductDetailPage({ params }: Params) {
   const { id } = await params;
+
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    notFound();
+  }
+
   const supabase = await getServerSupabase();
   const {
     data: { user },
@@ -26,35 +34,9 @@ export default async function ProductDetailPage({ params }: Params) {
     .eq("id", id)
     .maybeSingle();
 
-  const fallback: Product & {
-    ingredients?: string[];
-    skin_type?: string[];
-    concerns?: string[];
-    how_to_use?: string;
-    brand?: string;
-    tokopedia_url?: string | null;
-    shopee_url?: string | null;
-  } = {
-    id,
-    name: "Product",
-    price: 0,
-    image: "",
-    rating: 0,
-    skinType: "",
-    keyIngredients: [],
-    benefits: [],
-    size: "",
-    category: "",
-    category_id: 0,
-    product_type_id: 0,
-    ingredients: [],
-    skin_type: [],
-    concerns: [],
-    how_to_use: "",
-    brand: "",
-    tokopedia_url: null,
-    shopee_url: null,
-  };
+  if (!data) {
+    notFound();
+  }
 
   const product: Product & {
     description?: string;
@@ -65,30 +47,28 @@ export default async function ProductDetailPage({ params }: Params) {
     brand?: string;
     tokopedia_url?: string | null;
     shopee_url?: string | null;
-  } = data
-      ? {
-        id: String(data.id),
-        name: data.name ?? "Product",
-        price: Number(data.price) || 0,
-        image: data.image ?? "",
-        rating: Number(data.rating ?? 0) || 0,
-        skinType: String(data.skin_type ?? ""),
-        keyIngredients: Array.isArray(data.ingredients) ? data.ingredients : [],
-        benefits: Array.isArray(data.concerns) ? data.concerns : [],
-        size: data.size ?? "",
-        category: data.category ?? "",
-        category_id: Number(data.category_id) || 0,
-        product_type_id: Number(data.product_type_id) || 0,
-        description: data.description ?? "",
-        ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
-        skin_type: Array.isArray(data.skin_type) ? data.skin_type : [],
-        concerns: Array.isArray(data.concerns) ? data.concerns : [],
-        how_to_use: data.how_to_use ?? "",
-        brand: data.brand ?? "",
-        tokopedia_url: data.tokopedia_url ?? null,
-        shopee_url: data.shopee_url ?? null,
-      }
-      : fallback;
+  } = {
+    id: data.id,
+    name: data.name ?? "Product",
+    price: Number(data.price) || 0,
+    image: data.image ?? "",
+    rating: Number(data.rating ?? 0) || 0,
+    skinType: String(data.skin_type ?? ""),
+    keyIngredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+    benefits: Array.isArray(data.concerns) ? data.concerns : [],
+    size: data.size ?? "",
+    category: data.category ?? "",
+    category_id: Number(data.category_id) || 0,
+    product_type_id: Number(data.product_type_id) || 0,
+    description: data.description ?? "",
+    ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+    skin_type: Array.isArray(data.skin_type) ? data.skin_type : [],
+    concerns: Array.isArray(data.concerns) ? data.concerns : [],
+    how_to_use: data.how_to_use ?? "",
+    brand: data.brand ?? "",
+    tokopedia_url: data.tokopedia_url ?? null,
+    shopee_url: data.shopee_url ?? null,
+  };
 
   const ingredients: string[] = Array.isArray(product.ingredients) ? product.ingredients : [];
   const skinTypeText = Array.isArray(product.skin_type) ? product.skin_type.join(", ") : String(product.skin_type ?? "All");
@@ -158,11 +138,13 @@ export default async function ProductDetailPage({ params }: Params) {
               )}
             </div>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 max-w-2xl">
-              <form action={addToCart} className="flex-1 min-w-[200px]">
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 max-w-2xl">
+              <form action={addToCart}>
                 <input type="hidden" name="productId" value={product.id} />
                 <input type="hidden" name="qty" value={1} />
-                <Button type="submit" className="w-full text-lg py-4">Add to Cart</Button>
+                <Button type="submit" className="h-20 w-20 rounded-full p-0 flex items-center justify-center bg-brand-primary text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" aria-label="Add to cart">
+                  <CartIcon className="h-10 w-10" />
+                </Button>
               </form>
 
               <a
@@ -209,5 +191,15 @@ export default async function ProductDetailPage({ params }: Params) {
         </div>
       </div>
     </section>
+  );
+}
+
+function CartIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
   );
 }

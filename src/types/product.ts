@@ -20,7 +20,7 @@ export type Product = {
 export type Review = {
   id: string;
   user_id: string;
-  product_id: string | number; // Jaga-jaga bisa string atau number
+  product_id: string; // UUID string
   rating: number;
   comment: string | null;      // Komentar bisa kosong (null)
   created_at: string;          // Supabase return string, bukan Date

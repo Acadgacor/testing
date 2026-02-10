@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import CompareBar from "@/components/CompareBar";
 import Footer from "@/components/Footer";
+import ServiceWorkerRemover from "@/components/ServiceWorkerRemover";
 import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
 
 const geistSans = Geist({
@@ -46,6 +47,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-brand-dark min-h-screen flex flex-col`}
       >
+        <ServiceWorkerRemover />
         <Navbar user={user} />
         <main className="flex-1">{children}</main>
         <CompareBar />

@@ -1,7 +1,7 @@
 import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { updateProfile } from "@/actions/profile";
+import { updateProfile, syncProfile } from "@/actions/profile";
 import SkinProfilePanel from "@/components/SkinProfilePanel";
 import LogoutButton from "@/components/LogoutButton";
 import { requireUser } from "@/lib/authHelpers";
@@ -22,7 +22,14 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="p-6">
-            <h2 className="text-lg font-semibold text-brand-dark">Edit Profile</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-brand-dark">Edit Profile</h2>
+              <form action={syncProfile}>
+                <Button variant="outline" size="sm" type="submit" className="text-xs">
+                  Sync from Email
+                </Button>
+              </form>
+            </div>
             <form action={updateProfile} className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm text-brand-light">Full name</label>
