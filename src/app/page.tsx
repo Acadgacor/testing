@@ -9,12 +9,23 @@ export const revalidate = 0;
 
 export default async function Home() {
   const supabase = await getServerSupabaseRSC();
-  const { data: featured } = await supabase
+
+  // Fetch Featured Products (is_featured = true)
+  const { data: featuredProducts } = await supabase
+    .from("products")
+    .select("id,name,price,image,category,rating")
+    .eq("is_featured", true)
+    .limit(4);
+
+  // Fetch Best Sellers (original logic using 'featured' column, or general popularity)
+  // Renaming variable for clarity, though keeping original query logic if that's how "Best Sellers" was defined
+  const { data: bestSellers } = await supabase
     .from("products")
     .select("id,name,price,image")
     .eq("featured", true)
     .limit(4);
-  let rows = featured ?? [];
+
+  let rows = bestSellers ?? [];
   if (!rows || rows.length === 0) {
     const { data: top } = await supabase
       .from("products")
@@ -22,10 +33,33 @@ export default async function Home() {
       .limit(4);
     rows = top ?? [];
   }
-  const items = rows.map((r: any) => ({ id: String(r.id), name: r.name, price: Number(r.price) || 0, image: r.image || "/vercel.svg", rating: 0 }));
+
+  const bestSellerItems = rows.map((r: any) => ({ id: String(r.id), name: r.name, price: Number(r.price) || 0, image: r.image || "/vercel.svg", rating: 0 }));
+  const featuredItems = (featuredProducts ?? []).map((r: any) => ({ id: String(r.id), name: r.name, price: Number(r.price) || 0, image: r.image || "/vercel.svg", rating: r.rating || 0, category: r.category }));
+
   return (
     <main>
       <Hero />
+
+      {/* Featured Products Section */}
+      {featuredItems.length > 0 && (
+        <section className="py-12 sm:py-16 bg-neutral-50/50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-8 text-center">
+              <Badge variant="outline">Featured</Badge>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-brand-dark">Produk Unggulan</h2>
+              <p className="mt-2 text-sm text-brand-light">Koleksi istimewa pilihan kami untuk Anda.</p>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredItems.map((p: any) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Best Sellers Section */}
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8 text-center">
@@ -34,7 +68,7 @@ export default async function Home() {
             <p className="mt-2 text-sm text-brand-light">Pilihan populer dengan rating tinggi.</p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {items.map((p) => (
+            {bestSellerItems.map((p) => (
               <ProductCard key={p.id} product={{ id: p.id, name: p.name, price: p.price, image: p.image, rating: p.rating }} />
             ))}
           </div>
