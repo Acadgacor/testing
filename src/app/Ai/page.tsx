@@ -3,9 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
+type ChatContentPart = {
+  type: "text";
+  text?: string;
+};
+
 type ChatMessage = {
   role: "user" | "assistant";
-  content: string;
+  content: string | ChatContentPart[];
 };
 
 const starterPrompts = [
@@ -153,15 +158,32 @@ function formatContent(text: string) {
 
 function Bubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
+
+  // Extract text only (image support removed)
+  let textContent = "";
+
+  if (typeof message.content === "string") {
+    textContent = message.content;
+  } else if (Array.isArray(message.content)) {
+    message.content.forEach((part) => {
+      if (part.type === "text" && part.text) {
+        textContent += part.text;
+      }
+    });
+  }
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} w-full`}>
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${isUser
+        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm flex flex-col gap-2 ${isUser
           ? "bg-brand-primary text-brand-dark rounded-br-sm"
           : "bg-white/90 text-brand-dark border border-brand-primary/10 rounded-bl-sm"
           }`}
-        dangerouslySetInnerHTML={{ __html: formatContent(message.content) }}
-      />
+      >
+        {textContent && (
+          <div dangerouslySetInnerHTML={{ __html: formatContent(textContent) }} />
+        )}
+      </div>
     </div>
   );
 }
@@ -176,20 +198,61 @@ export default function AiPage() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [analysisContext, setAnalysisContext] = useState<string | null>(null); // New State
+
   const listRef = useRef<HTMLDivElement | null>(null);
+
+  // 1. AUTO-DETECT CONTEXT
+  useEffect(() => {
+    const savedAnalysis = sessionStorage.getItem("lastSkinAnalysis");
+    if (savedAnalysis) {
+      setAnalysisContext(savedAnalysis);
+      // Optional: Add automated opening message if not already present
+      setMessages((prev) => {
+        // Only add if we haven't added it yet (simple check)
+        const hasContextMsg = prev.some(m => typeof m.content === "string" && m.content.includes("Konteks medis aktif"));
+        if (!hasContextMsg && prev.length === 1) {
+          return [
+            ...prev,
+            {
+              role: "assistant",
+              content: "Halo! Saya sudah lihat hasil analisis kulitmu dari halaman Diagnosis. Ada yang ingin ditanyakan tentang masalah kulit yang terdeteksi? (Konteks medis aktif)",
+            }
+          ];
+        }
+        return prev;
+      });
+    }
+  }, []);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
+  const clearAnalysisContext = () => {
+    sessionStorage.removeItem("lastSkinAnalysis");
+    setAnalysisContext(null);
+    setMessages([
+      {
+        role: "assistant",
+        content: "Konteks analisis sebelumnya telah dihapus. Mulai sesi konsultasi baru ya!",
+      },
+    ]);
+  };
+
   async function sendMessage(content?: string) {
     const text = (content ?? input).trim();
     if (!text || loading) return;
-    const userMessage: ChatMessage = { role: "user", content: text };
+
+    let userMessage: ChatMessage;
+
+    userMessage = { role: "user", content: text };
+
     const nextMessages = [...messages, userMessage];
     setMessages(nextMessages);
     setInput("");
     setLoading(true);
+
     try {
       const supabase = getSupabaseClient();
       const { data: { session } } = await supabase.auth.getSession();
@@ -200,10 +263,34 @@ export default function AiPage() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
+      // PREPARE PAYLOAD WITH CONTEXT INJECTION
+      // We clone the messages to verify/inject context without showing it in UI
+      const payloadMessages = JSON.parse(JSON.stringify(nextMessages)); // Deep clone
+
+      if (analysisContext) {
+        // Inject into the VERY LAST message (the one being processed now) 
+        // effectively giving specific context to this turn
+        const lastMsg = payloadMessages[payloadMessages.length - 1];
+        const contextString = `\n\n[SYSTEM CONTEXT: User has a previous Skin Diagnosis Report. Use this reference: ${analysisContext}]\n`;
+
+        if (typeof lastMsg.content === "string") {
+          lastMsg.content += contextString;
+        } else if (Array.isArray(lastMsg.content)) {
+          // Find text part and append
+          const textPart = lastMsg.content.find((p: any) => p.type === "text");
+          if (textPart) {
+            textPart.text += contextString;
+          } else {
+            // weird edge case, push new text part
+            lastMsg.content.push({ type: "text", text: contextString });
+          }
+        }
+      }
+
       const res = await fetch("/api/skin-ai", {
         method: "POST",
         headers,
-        body: JSON.stringify({ mode: "chat", messages: nextMessages }),
+        body: JSON.stringify({ mode: "chat", messages: payloadMessages }),
       });
       if (!res.ok) {
         let reason = "Gagal menghubungi AI";
@@ -271,7 +358,26 @@ export default function AiPage() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="flex h-[520px] flex-col rounded-3xl border border-brand-primary/20 bg-white/90 shadow-sm backdrop-blur">
+          <section className="flex h-[520px] flex-col rounded-3xl border border-brand-primary/20 bg-white/90 shadow-sm backdrop-blur relative overflow-hidden">
+
+            {/* CONTEXT BANNER */}
+            {analysisContext && (
+              <div className="bg-blue-50 border-b border-blue-100 px-5 py-2 flex items-center justify-between">
+                <p className="text-xs text-blue-700 flex items-center gap-2 font-medium">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Menggunakan hasil analisis medis terakhir
+                </p>
+                <button
+                  onClick={clearAnalysisContext}
+                  className="text-[10px] bg-white border border-blue-200 px-2 py-1 rounded-md text-gray-600 hover:text-red-600 hover:border-red-200 transition"
+                >
+                  Hapus Konteks
+                </button>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 border-b border-brand-primary/10 px-5 py-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary text-brand-dark font-semibold">
                 AI
@@ -294,18 +400,24 @@ export default function AiPage() {
                 <Bubble key={idx} message={msg} />
               ))}
             </div>
-            <form
-              onSubmit={handleSubmit}
-              className="border-t border-brand-primary/10 bg-brand-secondary/60 px-5 py-4"
-            >
-              <div className="flex items-end gap-3">
+
+            {/* Input Area */}
+            <div className="border-t border-brand-primary/10 bg-brand-secondary/60 px-5 py-4">
+              <form onSubmit={handleSubmit} className="flex items-end gap-3">
                 <div className="flex-1">
                   <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
                     placeholder="Ceritakan kondisi kulit atau pertanyaanmu..."
-                    rows={2}
-                    className="w-full resize-none rounded-2xl border border-brand-primary/30 bg-white px-4 py-3 text-sm text-brand-dark shadow-sm focus:border-brand-primary focus:outline-none"
+                    rows={1}
+                    className="w-full resize-none rounded-2xl border border-brand-primary/30 bg-white px-4 py-3 text-sm text-brand-dark shadow-sm focus:border-brand-primary focus:outline-none min-h-[46px] max-h-[120px]"
+                    style={{ height: 'auto', minHeight: '46px' }}
                   />
                   <p className="mt-1 text-[11px] text-brand-light">
                     Jangan bagikan data pribadi. Untuk gejala berat (nyeri hebat, demam, luka
@@ -317,8 +429,8 @@ export default function AiPage() {
                 </div>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="inline-flex h-11 w-12 items-center justify-center rounded-2xl bg-brand-primary text-brand-dark font-semibold shadow-sm transition hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={loading || !input.trim()}
+                  className="inline-flex h-11 w-12 items-center justify-center rounded-2xl bg-brand-primary text-brand-dark font-semibold shadow-sm transition hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-60 mb-[6px]"
                   aria-label="Kirim pesan"
                 >
                   {loading ? (
@@ -352,8 +464,8 @@ export default function AiPage() {
                     </svg>
                   )}
                 </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </section>
 
           <aside className="space-y-4">

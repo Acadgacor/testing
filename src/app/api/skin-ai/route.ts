@@ -5,9 +5,14 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-const MODEL = process.env.NEXT_GROQ_MODEL || "openai/gpt-oss-120b";
+const VISION_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
+const BRAIN_MODEL = "openai/gpt-oss-120b";
+
 const CHAT_MAX_TOKENS = Number(process.env.NEXT_GROQ_MAX_TOKENS || 2048);
 const ANALYSIS_MAX_TOKENS = Number(process.env.NEXT_GROQ_ANALYSIS_MAX_TOKENS || 256);
+
+const VISION_SYSTEM_PROMPT =
+  "Anda adalah analis dermatologi teknis. Deskripsikan kondisi kulit di foto ini secara SANGAT MENDETAIL (tekstur, warna, tipe jerawat, lokasi masalah). Jangan beri saran, HANYA fakta visual.";
 
 const ANALYSIS_PROMPT =
   "You are an Indonesian dermatology assistant. Analyze the user's skin profile based on their answers. " +
@@ -17,21 +22,63 @@ const ANALYSIS_PROMPT =
 
 const CHAT_PROMPT =
   "You are a friendly and personal skincare and body care bestie. You speak in a warm, engaging, and casual Indonesian tone (using terms like 'Kak', 'Bestie'). " +
-  "Your ONLY purpose is to help with skincare, body care, and dermatology concerns. " +
-  "If the user asks about anything unrelated to skin or body care (e.g., math, politics, coding, general life advice not related to self-care), you MUST politely refuse. " +
-  "Say something like: 'Maaf ya Bestie, aku cuma ngerti soal skincare dan body care nih. Yuk ngobrol soal kulit glowing aja! ✨' " +
-  "Do NOT answer off-topic questions. " +
-  "Give routine suggestions, ingredient tips, and safety notes conversationally.";
+  "Your Goal: Provide a consultative dermatology experience.\n\n" +
+  "STRICT RESPONSE FLOW (Follow this order):\n" +
+  "1. ANALYSIS: Analyze the user's skin condition based on their description or image. Explain WHAT it is and WHY it might be happening (causes).\n" +
+  "2. TIPS: Give immediate behavioral/lifestyle advice to reduce infection or aggravation (e.g., 'Jangan dipencet ya kak', 'Hindari makanan berminyak').\n" +
+  "3. PERMISSION: **DO NOT** recommend specific products yet. Instead, ask the user: 'Mau aku rekomendasiin produk yang cocok buat kondisi ini, Bestie?'\n\n" +
+  "RULES:\n" +
+  "- If the user explicitly asks for products *after* you offered, THEN you can list valid products.\n" +
+  "- If this is the FIRST interaction about a problem, NEVER list products immediately. Stick to Analysis + Tips + Permission.\n" +
+  "- Refuse off-topic questions politely.";
 
-// Schema Validation (Strict: Role must be "user" or "assistant" only. "system" is forbidden to prevent injection)
+const DIAGNOSIS_PROMPT =
+  "You are a professional Dermatologist AI. Your task is to generate a structured Medical Report based on the patient's skin analysis.\n" +
+  "Format your response EXACTLY as a JSON-like structure (but plain text is fine, just structured) with these sections:\n\n" +
+  "**MEDICAL REPORT**\n" +
+  "TARGET: [Patient Name/User]\n" +
+  "DATE: [Current Date]\n\n" +
+  "--- \n" +
+  "**1. DETECTED CONDITIONS**\n" +
+  "- [Condition 1] (e.g., Acne Vulgaris)\n" +
+  "- [Condition 2] (e.g., Post-Inflammatory Hyperpigmentation)\n" +
+  "- [Condition 3] (e.g., Oversized Pores)\n\n" +
+  "**2. ANALYSIS**\n" +
+  "[Detailed technical analysis of the visual evidence. Explain severity, distribution, and probable causes.]\n\n" +
+  "**3. CLINICAL RECOMMENDATIONS**\n" +
+  "- [Treatment 1]\n" +
+  "- [Treatment 2]\n\n" +
+  "**4. NEXT STEPS**\n" +
+  "Please consult with our AI Assistant for a personalized product routine.\n" +
+  "---";
+
+// Schema Validation (Strict: Role must be "user" or "assistant". "system" is forbidden)
+const contentSchema = z.union([
+  z.string(), // Removed max() to allow long RAG context
+  z.array(
+    z.union([
+      z.object({
+        type: z.literal("text"),
+        text: z.string(),
+      }),
+      z.object({
+        type: z.literal("image_url"),
+        image_url: z.object({
+          url: z.string(), // Base64 or URL
+        }),
+      }),
+    ])
+  ),
+]);
+
 const requestSchema = z.object({
   messages: z.array(
     z.object({
-      role: z.enum(["user", "assistant"]), // FIX: Allow "assistant" so chat history works, but BLOCK "system"
-      content: z.string().max(1000, "Message content exceeds 1000 characters"),
+      role: z.enum(["user", "assistant"]),
+      content: contentSchema,
     })
   ),
-  mode: z.enum(["chat", "analysis"]).optional(),
+  mode: z.enum(["chat", "analysis", "diagnosis"]).optional(),
 });
 
 export async function POST(req: Request) {
@@ -52,7 +99,7 @@ export async function POST(req: Request) {
 
       const ratelimit = new Ratelimit({
         redis: redis,
-        limiter: Ratelimit.slidingWindow(5, "1 h"),
+        limiter: Ratelimit.slidingWindow(20, "1 h"),
         analytics: true,
       });
 
@@ -94,30 +141,103 @@ export async function POST(req: Request) {
     }
 
     const { messages, mode } = validation.data;
-
-    // 4. Existing Logic
     const apiKey = process.env.NEXT_GROQ_API || process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "Missing GROQ API key" }, { status: 500 });
     }
 
+    const groq = new Groq({ apiKey });
+
+    // --- PIPELINE LOGIC ---
+
+    const lastMessage = messages[messages.length - 1];
+
+    // Select Prompt based on Mode
+    let finalSystemPrompt = CHAT_PROMPT;
+    if (mode === "analysis") finalSystemPrompt = ANALYSIS_PROMPT;
+    if (mode === "diagnosis") finalSystemPrompt = DIAGNOSIS_PROMPT;
+
+    let finalUserContent = "";
+
+    // Check if the last message contains an image
+    const hasImage = Array.isArray(lastMessage.content) && lastMessage.content.some((c) => c.type === "image_url");
+
+    if (hasImage && Array.isArray(lastMessage.content)) {
+      // === STAGE 1: VISION ANALYSIS ===
+      const imagePart = lastMessage.content.find((c) => c.type === "image_url");
+      const textPart = lastMessage.content.find((c) => c.type === "text");
+      const userText = textPart && textPart.type === "text" ? textPart.text : "";
+
+      if (imagePart && imagePart.type === "image_url") {
+        try {
+          const visionCompletion = await groq.chat.completions.create({
+            model: VISION_MODEL,
+            messages: [
+              { role: "system", content: VISION_SYSTEM_PROMPT },
+              {
+                role: "user",
+                content: [
+                  { type: "image_url", image_url: { url: imagePart.image_url.url } },
+                  { type: "text", text: "Deskripsikan kondisi kulit di gambar ini." },
+                ],
+              },
+            ],
+            temperature: 0.1,
+            max_tokens: 512,
+          });
+
+          const imageAnalysisResult = visionCompletion.choices[0]?.message?.content || "Gagal menganalisis gambar.";
+
+          // Inject analysis into the final prompt
+          finalUserContent = `Ini adalah hasil analisis visual wajah saya dari alat scanner: [${imageAnalysisResult}].\n\nPertanyaan saya: "${userText}"`;
+
+        } catch (visionError) {
+          console.error("Vision Step Error:", visionError);
+          // Fallback if vision fails: tell brain model we couldn't analyze
+          finalUserContent = `User mencoba mengirim gambar tetapi analisis visual gagal. Pertanyaan user: "${userText}"`;
+        }
+      }
+    } else {
+      // Text Only - Just use the content as is
+      if (typeof lastMessage.content === "string") {
+        finalUserContent = lastMessage.content;
+      } else if (Array.isArray(lastMessage.content)) {
+        finalUserContent = lastMessage.content
+          .filter(c => c.type === 'text')
+          .map(c => (c.type === 'text' ? c.text : ''))
+          .join('\n');
+      }
+    }
+
+    // === STAGE 2: BRAIN / REASONING ===
+
+    // Prepare history for context
+    const previousMessages = messages.slice(0, -1).map((m) => {
+      let content = "";
+      if (typeof m.content === "string") {
+        content = m.content;
+      } else {
+        content = m.content
+          .filter(c => c.type === 'text')
+          .map(c => (c.type === 'text' ? c.text : ''))
+          .join(' ');
+      }
+      return { role: m.role, content };
+    });
+
+    const brainMessages = [
+      { role: "system", content: finalSystemPrompt },
+      ...previousMessages,
+      { role: "user", content: finalUserContent },
+    ];
+
     const isAnalysis = mode === "analysis";
-    const systemPrompt = isAnalysis ? ANALYSIS_PROMPT : CHAT_PROMPT;
     const temperature = isAnalysis ? 0.3 : 0.6;
     const maxTokens = isAnalysis ? ANALYSIS_MAX_TOKENS : CHAT_MAX_TOKENS;
 
-    const chatMessages = [
-      { role: "system", content: systemPrompt },
-      ...messages.map((m: any) => ({
-        role: m.role,
-        content: m.content,
-      })),
-    ];
-
-    const groq = new Groq({ apiKey });
     const completion = await groq.chat.completions.create({
-      model: MODEL,
-      messages: chatMessages as any,
+      model: BRAIN_MODEL,
+      messages: brainMessages as any,
       temperature,
       max_tokens: maxTokens,
     });

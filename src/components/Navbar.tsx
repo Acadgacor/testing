@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
   { label: "Compare", href: "/compare" },
+  { label: "Skin Check", href: "/diagnosis" },
   { label: "AI Chat", href: "/Ai" },
 ];
 
