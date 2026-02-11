@@ -23,11 +23,11 @@ const CHAT_PROMPT =
   "Do NOT answer off-topic questions. " +
   "Give routine suggestions, ingredient tips, and safety notes conversationally.";
 
-// Schema Validation
+// Schema Validation (Strict: Role must be "user" or "assistant" only. "system" is forbidden to prevent injection)
 const requestSchema = z.object({
   messages: z.array(
     z.object({
-      role: z.enum(["user", "assistant", "system"]),
+      role: z.enum(["user", "assistant"]), // FIX: Allow "assistant" so chat history works, but BLOCK "system"
       content: z.string().max(1000, "Message content exceeds 1000 characters"),
     })
   ),
@@ -36,38 +36,6 @@ const requestSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    // 1. Authentication (Supabase)
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return NextResponse.json({ error: "Missing Authorization header" }, { status: 401 });
-    }
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    // Extract token "Bearer <token>"
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // 2. Input Validation (Zod)
-    const body = await req.json();
-    const validation = requestSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json({ error: "Invalid request body", details: validation.error.format() }, { status: 400 });
-    }
-
-    const { messages, mode } = validation.data;
-
-    // 3. Rate Limiting (Upstash)
-    // Validate Env Vars for Senior Security Engineer standards (Fail Secure)
-    // Keys in .env are prefixed with NEXT_ based on file inspection
     const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.NEXT_UPSTASH_REDIS_REST_URL;
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.NEXT_UPSTASH_REDIS_REST_TOKEN;
 
@@ -96,12 +64,38 @@ export async function POST(req: Request) {
       }
     } catch (error) {
       console.error("Rate Limit Error:", error);
-      // Check if previous user interaction implies they prefer knowing about errors.
-      // But user asked for PURE CODE. I will return 500 if rate limit check specifically fails validation/connection to avoid unthrottled abuse.
       return NextResponse.json({ error: "Rate limit service error" }, { status: 500 });
     }
 
-    // 4. Existing Logic (Strictly Preserved)
+    // 2. Authentication (Supabase)
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Missing Authorization header" }, { status: 401 });
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 3. Input Validation (Zod)
+    const body = await req.json();
+    const validation = requestSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json({ error: "Invalid request body", details: validation.error.format() }, { status: 400 });
+    }
+
+    const { messages, mode } = validation.data;
+
+    // 4. Existing Logic
     const apiKey = process.env.NEXT_GROQ_API || process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "Missing GROQ API key" }, { status: 500 });
