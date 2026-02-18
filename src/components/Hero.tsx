@@ -9,8 +9,8 @@ export default function Hero() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-brand-secondary px-3 py-1 text-xs font-medium text-brand-dark ring-1 ring-black/5">New • Smart Beauty Platform</div>
-            <h1 className="mt-4 text-4xl sm:text-5xl font-semibold tracking-tight text-brand-dark">Temukan Jodoh Skincare-mu Tanpa Bingung</h1>
-            <p className="mt-4 text-base sm:text-lg text-brand-light">Platform cerdas dengan fitur <span className="font-semibold text-brand-primary-hover">Compare Product</span> dan <span className="font-semibold text-brand-primary-hover">AI Chat</span> untuk membantumu memahami jenis kulit dan menemukan produk yang paling tepat.</p>
+            <h1 className="mt-4 text-4xl sm:text-5xl font-semibold tracking-tight text-brand-dark">Kenali Jenis Kulitmu, Temukan Skincare Terbaik</h1>
+            <p className="mt-4 text-base sm:text-lg text-brand-light">Platform cerdas untuk <span className="font-semibold text-brand-primary-hover">Analisa Kulit</span>, <span className="font-semibold text-brand-primary-hover">Bandingkan Produk</span>, dan <span className="font-semibold text-brand-primary-hover">Konsultasi AI</span> agar kamu tidak salah pilih lagi.</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Button href="/products">Shop Now</Button>
               <Button variant="ai" href="/Ai">

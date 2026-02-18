@@ -77,39 +77,49 @@ export default async function Home() {
       </section>
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-semibold tracking-tight text-brand-dark">Kenapa Beaulytics?</h2>
+            <p className="mt-2 text-sm text-brand-light">Solusi lengkap untuk perjalanan kulit sehatmu.</p>
+          </div>
           <div className="grid gap-6 lg:grid-cols-3">
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-brand-dark">Bahan premium</h3>
-              <p className="mt-2 text-sm text-brand-light">Niacinamide, Vitamin C, Hyaluronic Acid dengan standar kualitas tinggi.</p>
+              <h3 className="text-lg font-semibold text-brand-dark">Analisa Kulit</h3>
+              <p className="mt-2 text-sm text-brand-light">Ketahui jenis & kondisi kulitmu secara akurat dalam hitungan detik dengan teknologi AI.</p>
             </Card>
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-brand-dark">Aman untuk kulit</h3>
-              <p className="mt-2 text-sm text-brand-light">Dermatologically tested, cocok untuk semua jenis kulit.</p>
+              <h3 className="text-lg font-semibold text-brand-dark">Bandingkan Produk</h3>
+              <p className="mt-2 text-sm text-brand-light">Adu kandungan, manfaat, dan harga produk untuk keputusan belanja yang paling cerdas.</p>
             </Card>
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-brand-dark">Ritual minimalis</h3>
-              <p className="mt-2 text-sm text-brand-light">Rutinitas sederhana, hasil maksimal.</p>
+              <h3 className="text-lg font-semibold text-brand-dark">AI Chat Consultant</h3>
+              <p className="mt-2 text-sm text-brand-light">Curhat masalah kulit kapan saja dan dapatkan rekomendasi rutinitas yang personal.</p>
             </Card>
           </div>
         </div>
       </section>
-      <section className="py-12 sm:py-16">
+      {/* <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8 text-center">
             <Badge variant="outline">Testimonials</Badge>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-brand-dark">Apa kata mereka</h2>
-            <p className="mt-2 text-sm text-brand-light">Kulit lembut, glowing, dan sehat.</p>
+            <p className="mt-2 text-sm text-brand-light">Kulit lembut, glowing, dan sehat bersama Beaulytics.</p>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="p-6">
-                <p className="text-sm text-brand-dark">&quot;Produk ini bikin kulitku halus dan cerah. Teksturnya nyaman.&quot;</p>
-                <div className="mt-3 text-xs text-brand-light">— Beaulytics Customer</div>
-              </Card>
-            ))}
+            <Card className="p-6">
+              <p className="text-sm text-brand-dark">&quot;Fitur bandingin produknya bantu banget! Akhirnya nemu moisturizer yang pas di kulit & dompet.&quot;</p>
+              <div className="mt-3 text-xs text-brand-light">— Sarah, Mahasiswi</div>
+            </Card>
+            <Card className="p-6">
+              <p className="text-sm text-brand-dark">&quot;AI Chat-nya pinter banget, saran rutinnya simpel tapi bikin jerawatku reda dalam 2 minggu.&quot;</p>
+              <div className="mt-3 text-xs text-brand-light">— Rina, Karyawan Swasta</div>
+            </Card>
+            <Card className="p-6">
+              <p className="text-sm text-brand-dark">&quot;Suka banget sama analisa kulitnya, akurat! Jadi tau kenapa selama ini sering breakout salah produk.&quot;</p>
+              <div className="mt-3 text-xs text-brand-light">— Dinda, Content Creator</div>
+            </Card>
           </div>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }
