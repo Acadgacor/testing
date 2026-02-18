@@ -4,7 +4,7 @@ const VISION_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
 const BRAIN_MODEL = "openai/gpt-oss-120b";
 
 const CHAT_MAX_TOKENS = Number(process.env.NEXT_GROQ_MAX_TOKENS || 2048);
-const ANALYSIS_MAX_TOKENS = Number(process.env.NEXT_GROQ_ANALYSIS_MAX_TOKENS || 256);
+const ANALYSIS_MAX_TOKENS = Number(process.env.NEXT_GROQ_ANALYSIS_MAX_TOKENS || 2048);
 
 const VISION_SYSTEM_PROMPT =
     "Anda adalah analis dermatologi teknis. Deskripsikan kondisi kulit di foto ini secara SANGAT MENDETAIL (tekstur, warna, tipe jerawat, lokasi masalah). Jangan beri saran, HANYA fakta visual.";
@@ -199,5 +199,6 @@ export async function processSkinAnalysis({ messages, mode, apiKey }: ProcessSki
         max_tokens: maxTokens,
     });
 
-    return completion?.choices?.[0]?.message?.content ?? "";
+    const message = completion?.choices?.[0]?.message;
+    return message?.content || (message as any)?.reasoning || "";
 }

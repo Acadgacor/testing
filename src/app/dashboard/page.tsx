@@ -15,8 +15,6 @@ export default async function DashboardPage() {
 
   // Merge profile with user_metadata (metadata takes precedence if profile is missing/empty)
   const meta = user?.user_metadata || {};
-  console.log("DASHBOARD: User Metadata Skin Profile:", JSON.stringify(meta.skin_profile, null, 2));
-  console.log("DASHBOARD: User Metadata Skin Tags:", meta.skin_tags);
   const profile = {
     full_name: profileData?.full_name || meta.full_name || meta.name || "",
     avatar_url: profileData?.avatar_url || meta.avatar_url || meta.picture || "",

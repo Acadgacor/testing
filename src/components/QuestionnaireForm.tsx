@@ -95,6 +95,30 @@ export default function QuestionnaireForm({ user }: Props) {
       setAiLoading(true);
       const summary = aiSummary || (await fetchAiSummary());
       setAiSummary(summary);
+
+      // Clean up potential noise from AI response
+      const cleanSummary = summary
+        .replace(/^(Medical Report|Analysis|Result|Detected Conditions):/i, "")
+        .replace(/\r\n/g, ",")
+        .replace(/\n/g, ",");
+
+      const tags = cleanSummary
+        .split(",")
+        .map((tag) => tag.trim().replace(/^[-*•]\s*/, "")) // Remove bullet points if any
+        .filter((tag) => tag.length > 2); // Filter out very short/empty tags
+
+      // Update user di Client Side (ini kunci agar browser cookie mendapatkan session JWT baru)
+      const supabase = getSupabaseClient();
+      const { error: updateErr } = await supabase.auth.updateUser({
+        data: {
+          skin_profile: { answers, summary: cleanSummary, updated_at: new Date().toISOString() },
+          skin_tags: tags,
+          skinshort: cleanSummary,
+        }
+      });
+
+      if (updateErr) throw new Error(updateErr.message);
+
       const form = formRef.current;
       if (!form) return;
       const formData = new FormData(form);
