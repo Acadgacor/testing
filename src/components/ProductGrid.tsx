@@ -86,7 +86,7 @@ export default function ProductGrid() {
       ) : null}
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((p) => (
-          <ProductCard key={p.id} product={{ id: p.id, name: p.name, price: p.price, image: p.image, rating: p.rating, category: p.category, ingredients: p.keyIngredients }} />
+          <ProductCard key={p.id} product={{ id: p.id, name: p.name, price: p.price, image: p.image, rating: p.rating, category: p.category }} />
         ))}
       </div>
     </div>
