@@ -120,8 +120,41 @@ export default async function ProductDetailPage({ params }: Params) {
   const ratingVal = Number((product as any)?.rating);
   const hasRating = Number.isFinite(ratingVal);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: product.image,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "IDR",
+      price: product.price,
+      availability: "https://schema.org/InStock", // Assuming in stock for now
+      url: `https://www.beaulytics.com/products/${product.id}`,
+    },
+    brand: {
+      "@type": "Brand",
+      name: product.brand || "Unknown",
+    },
+    // Add aggregateRating if available
+    ...(hasRating
+      ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: ratingVal,
+          reviewCount: 1, // Placeholder if review count isn't available in this query
+        },
+      }
+      : {}),
+  };
+
   return (
     <section className="py-12 sm:py-20 lg:py-24 bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-start">
           {/* Image Section */}

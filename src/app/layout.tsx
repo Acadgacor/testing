@@ -30,28 +30,14 @@ export const metadata: Metadata = {
     "Ingredient Analysis",
     "Cosmetic Ingredients",
     "Skin Type",
-    "Oily Skin",
-    "Dry Skin",
-    "Sensitive Skin",
-    "Acne Prone Skin",
     "Product Comparison",
     "Beauty Analysis",
-    "Skincare Safe",
-    "Non-comedogenic",
-    "Fragrance Free",
     "Clean Beauty",
     "Skin Health",
-    "Dermatology",
-    "Cosmetic Chemistry",
   ],
   authors: [{ name: "Beaulytics Team" }],
   creator: "Beaulytics",
   publisher: "Beaulytics",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
   openGraph: {
     title: "Beaulytics: Discover Skincare Products & Routines",
     description:
@@ -67,17 +53,6 @@ export const metadata: Metadata = {
     description:
       "Beaulytics analyzes your skin type, ingredient preferences, and cosmetic needs to recommend the best products for your routine.",
     creator: "@beaulytics",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
   },
 };
 
