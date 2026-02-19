@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCartStore } from "@/store/cartStore";
 
@@ -34,8 +35,11 @@ export default function Navbar({ user }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const pathname = usePathname();
+  const isProductDetailPage = pathname?.startsWith("/products/") && pathname.split("/").length > 2;
+
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-neutral-100" : "bg-transparent"}`}>
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-neutral-100" : "bg-transparent"} ${isProductDetailPage ? "hidden md:block" : ""}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           <div className="flex items-center gap-2">
