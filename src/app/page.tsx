@@ -36,11 +36,11 @@ export default async function Home() {
   const selectQuery = "id,name,price,image,rating,category,reviews(rating),outbound_clicks(id)";
 
   // Fetch Featured Products
-  const { data: featuredProducts } = await supabase
-    .from("products")
-    .select(selectQuery)
-    .eq("is_featured", true)
-    .limit(4);
+  // const { data: featuredProducts } = await supabase
+  //   .from("products")
+  //   .select(selectQuery)
+  //   .eq("is_featured", true)
+  //   .limit(4);
 
   // Fetch Best Sellers
   const { data: bestSellers } = await supabase
@@ -60,15 +60,14 @@ export default async function Home() {
   }
 
   // 3. Map the data using the helper function
-  const featuredItems = (featuredProducts ?? []).map(formatProductData);
+  // const featuredItems = (featuredProducts ?? []).map(formatProductData);
   const bestSellerItems = rows.map(formatProductData);
 
   return (
     <main>
       <Hero />
-
       {/* Featured Products Section */}
-      {featuredItems.length > 0 && (
+      {/* {featuredItems.length > 0 && (
         <section className="py-12 sm:py-16 bg-neutral-50/50">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-8 text-center">
@@ -79,14 +78,13 @@ export default async function Home() {
             <div className="flex overflow-x-auto pb-4 gap-4 snap-x md:grid md:grid-cols-4 md:gap-6 md:pb-0 scrollbar-hide">
               {featuredItems.map((p: any) => (
                 <div key={p.id} className="w-[200px] md:w-auto snap-center shrink-0">
-                  {/* 4. Pass the fully formatted object directly */}
                   <ProductCard product={p} />
                 </div>
               ))}
             </div>
           </div>
         </section>
-      )}
+      )} */}
 
       {/* Best Sellers Section */}
       <section className="py-12 sm:py-16">
