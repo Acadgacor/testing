@@ -8,6 +8,7 @@ import { addToCart } from "@/actions/cart";
 import { trackOutboundClick } from "@/actions/tracking";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import { Loader2, Minus, Plus, X, Check, Copy } from "lucide-react";
+import LoginAuthModal from "@/components/ui/LoginAuthModal";
 
 type Product = {
     id: string;
@@ -62,6 +63,7 @@ export default function ProductPurchaseCard({ product }: { product: Product }) {
     const [quantity, setQuantity] = useState(1);
     const [loadingCode, setLoadingCode] = useState<"cart" | "buy" | null>(null);
     const [isShareOpen, setIsShareOpen] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const [showCopiedToast, setShowCopiedToast] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -83,7 +85,7 @@ export default function ProductPurchaseCard({ product }: { product: Product }) {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
-            router.push("/auth/login");
+            setShowLoginModal(true);
             return;
         }
 
@@ -309,6 +311,12 @@ export default function ProductPurchaseCard({ product }: { product: Product }) {
                 </div>,
                 document.body
             )}
+
+            {/* Login Auth Modal */}
+            <LoginAuthModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+            />
         </div>
     );
 }

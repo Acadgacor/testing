@@ -2,41 +2,21 @@
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
 
-import { cookies } from "next/headers";
+// Helper: Get existing Cart ID OR Create new Cart for LOGGED IN USER
+async function getOrCreateCartId(supabase: any, userId: string): Promise<string> {
+  // 1. Try to find existing cart for this user
+  const { data: cart } = await supabase
+    .from("carts")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
 
-// Helper: Get existing Cart ID OR Create new Cart
-async function getOrCreateCartId(supabase: any, userId?: string | null): Promise<string> {
-  const cookieStore = await cookies();
-  const cartIdCookie = cookieStore.get("cartId")?.value;
+  if (cart) return cart.id;
 
-  // 1. If user is logged in, try to find existing cart for this user
-  if (userId) {
-    const { data: cart } = await supabase
-      .from("carts")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (cart) return cart.id;
-  }
-
-  // 2. If guest (no userId) and has a cart cookie, verify it exists
-  if (!userId && cartIdCookie) {
-    const { data: cart } = await supabase
-      .from("carts")
-      .select("id")
-      .eq("id", cartIdCookie)
-      .maybeSingle();
-
-    if (cart) return cart.id;
-  }
-
-  // 3. Create new cart
-  const payload = userId ? { user_id: userId } : { user_id: null };
-
+  // 2. Create new cart
   const { data: created, error } = await supabase
     .from("carts")
-    .insert(payload)
+    .insert({ user_id: userId })
     .select("id")
     .single();
 
@@ -47,17 +27,6 @@ async function getOrCreateCartId(supabase: any, userId?: string | null): Promise
 
   if (!created) {
     throw new Error("Cart creation failed: No data returned.");
-  }
-
-  // 4. Save cookie for guest users
-  if (!userId) {
-    cookieStore.set("cartId", created.id, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
   }
 
   return created.id;
@@ -73,9 +42,14 @@ export async function addToCart(formData: FormData) {
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes?.user;
 
-  console.log("Current User:", user?.id || "Guest");
+  if (!user) {
+    // Should not happen if client-side checks are working, but good for security
+    throw new Error("User must be logged in to add to cart");
+  }
 
-  const cartId = await getOrCreateCartId(supabase, user?.id);
+  console.log("Current User:", user.id);
+
+  const cartId = await getOrCreateCartId(supabase, user.id);
 
   const { data: existing } = await supabase
     .from("cart_items")
@@ -118,7 +92,9 @@ export async function clearCart() {
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes?.user;
 
-  const cartId = await getOrCreateCartId(supabase, user?.id);
+  if (!user) return;
+
+  const cartId = await getOrCreateCartId(supabase, user.id);
 
   if (cartId) {
     await supabase.from("cart_items").delete().eq("cart_id", cartId);

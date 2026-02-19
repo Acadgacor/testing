@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { addToCart } from "@/actions/cart";
 import { Loader2, ShoppingBag } from "lucide-react";
+import { getSupabaseClient } from "@/lib/supabaseClient";
+import LoginAuthModal from "@/components/ui/LoginAuthModal";
 
 type Product = {
     id: string;
@@ -19,10 +21,21 @@ type Product = {
 export default function MobileProductActionBar({ product }: { product: Product }) {
     // const router = useRouter(); // Removing unused router
     const [loading, setLoading] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const addToCartClient = useCartStore((s) => s.add);
 
     const handleAddToCart = async () => {
         if (loading) return;
+
+        // Validate Auth
+        const supabase = getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+            setShowLoginModal(true);
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -98,6 +111,11 @@ export default function MobileProductActionBar({ product }: { product: Product }
                 </button>
             )}
 
+            {/* Login Auth Modal */}
+            <LoginAuthModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+            />
         </div>
     );
 }

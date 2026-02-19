@@ -4,6 +4,8 @@
 import { useState } from "react";
 import { trackOutboundClick } from "@/actions/tracking";
 import { Loader2, ExternalLink } from "lucide-react";
+import { getSupabaseClient } from "@/lib/supabaseClient";
+import LoginAuthModal from "@/components/ui/LoginAuthModal";
 
 type Props = {
     productId: string;
@@ -15,10 +17,21 @@ type Props = {
 
 export default function AddToCartButton({ productId, url, platform, className, children }: Props) {
     const [loading, setLoading] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     async function handleAffiliateClick(e: React.MouseEvent) {
         e.preventDefault();
         if (loading || !url) return;
+
+        // Validate Auth
+        const supabase = getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+            setShowLoginModal(true);
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -53,6 +66,11 @@ export default function AddToCartButton({ productId, url, platform, className, c
                     </>
                 )
             )}
+
+            <LoginAuthModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+            />
         </button>
     );
 }
