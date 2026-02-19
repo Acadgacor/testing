@@ -35,13 +35,6 @@ export default async function Home() {
   // 2. Select string for all queries
   const selectQuery = "id,name,price,image,rating,category,reviews(rating),outbound_clicks(id)";
 
-  // Fetch Featured Products
-  // const { data: featuredProducts } = await supabase
-  //   .from("products")
-  //   .select(selectQuery)
-  //   .eq("is_featured", true)
-  //   .limit(4);
-
   // Fetch Best Sellers
   const { data: bestSellers } = await supabase
     .from("products")
@@ -60,39 +53,18 @@ export default async function Home() {
   }
 
   // 3. Map the data using the helper function
-  // const featuredItems = (featuredProducts ?? []).map(formatProductData);
   const bestSellerItems = rows.map(formatProductData);
 
   return (
     <main>
       <Hero />
-      {/* Featured Products Section */}
-      {/* {featuredItems.length > 0 && (
-        <section className="py-12 sm:py-16 bg-neutral-50/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-8 text-center">
-              <Badge variant="outline">Featured</Badge>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-brand-dark">Produk Unggulan</h2>
-              <p className="mt-2 text-sm text-brand-light">Koleksi istimewa pilihan kami untuk Anda.</p>
-            </div>
-            <div className="flex overflow-x-auto pb-4 gap-4 snap-x md:grid md:grid-cols-4 md:gap-6 md:pb-0 scrollbar-hide">
-              {featuredItems.map((p: any) => (
-                <div key={p.id} className="w-[200px] md:w-auto snap-center shrink-0">
-                  <ProductCard product={p} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )} */}
-
       {/* Best Sellers Section */}
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8 text-center">
             <Badge>Best Sellers</Badge>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-brand-dark">Produk unggulan</h2>
-            <p className="mt-2 text-sm text-brand-light">Pilihan populer dengan rating tinggi.</p>
+            <p className="mt-2 text-sm text-brand-light">Pilihan produk terbaik.</p>
           </div>
           <div className="flex overflow-x-auto pb-4 gap-4 snap-x md:grid md:grid-cols-4 md:gap-6 md:pb-0 scrollbar-hide">
             {bestSellerItems.map((p: any) => (
