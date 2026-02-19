@@ -60,7 +60,30 @@ export async function submitReview(_prevState: any, formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/products/[id]");
+  // --- NEW: Calculate and Update Product Rating ---
+  const { data: allReviews } = await supabase
+    .from("reviews")
+    .select("rating")
+    .eq("product_id", productId);
+
+  if (allReviews && allReviews.length > 0) {
+    const totalRating = allReviews.reduce((sum, r) => sum + (r.rating || 0), 0);
+    const averageRating = totalRating / allReviews.length;
+
+    await supabase
+      .from("products")
+      .update({
+        rating: averageRating,
+        review_count: allReviews.length,
+      })
+      .eq("id", productId);
+  } else {
+    // If no reviews (unlikely since we just added one, but good for safety), set to 0 or keep as is
+    // For now, let's just update if we have data
+  }
+
+  revalidatePath("/products");
+  revalidatePath(`/products/${productId}`);
   return { success: true };
 }
 

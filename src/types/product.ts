@@ -15,6 +15,8 @@ export type Product = {
   how_to_use: string;
   tokopedia_url?: string | null;
   shopee_url?: string | null;
+  review_count?: number;
+  click_count?: number;
 };
 
 export type Review = {

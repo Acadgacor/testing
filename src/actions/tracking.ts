@@ -19,6 +19,21 @@ export async function trackOutboundClick(
             return { success: false, error: error.message };
         }
 
+        // --- NEW: Update Product click_count ---
+        const { data: product } = await supabase
+            .from("products")
+            .select("click_count")
+            .eq("id", productId)
+            .single();
+
+        if (product) {
+            const newCount = (product.click_count || 0) + 1;
+            await supabase
+                .from("products")
+                .update({ click_count: newCount })
+                .eq("id", productId);
+        }
+
         return { success: true };
     } catch (err) {
         console.error("Unexpected error tracking outbound click:", err);

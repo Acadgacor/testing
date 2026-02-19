@@ -12,6 +12,8 @@ type Props = {
     image?: string;
     rating?: number;
     category?: string;
+    review_count?: number;
+    click_count?: number;
   };
 };
 
@@ -19,6 +21,10 @@ export default function ProductCard({ product }: Props) {
   function formatRp(n: number) {
     return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
   }
+
+  const rating = product.rating || 0;
+  const reviewCount = product.review_count || 0;
+  const clickCount = product.click_count || 0;
 
   return (
     <Card className="group relative flex flex-col bg-white border border-neutral-200 overflow-hidden rounded-lg hover:shadow-md transition-shadow duration-300">
@@ -52,10 +58,21 @@ export default function ProductCard({ product }: Props) {
           {formatRp(product.price)}
         </div>
 
-        {/* Rating & Sold */}
+        {/* Rating & Stats */}
         <div className="flex items-center gap-1 text-xs text-neutral-500">
           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-          <span>{product.rating ? product.rating.toFixed(1) : "New"}</span>
+          <span className="font-medium text-neutral-700">
+            {rating > 0 ? rating.toFixed(1) : "New"}
+          </span>
+          {reviewCount > 0 && (
+            <span className="text-neutral-400">({reviewCount})</span>
+          )}
+          {clickCount > 0 && (
+            <>
+              <span className="text-neutral-300">•</span>
+              <span>{clickCount} diminati</span>
+            </>
+          )}
         </div>
       </div>
     </Card>

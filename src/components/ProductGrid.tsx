@@ -26,7 +26,7 @@ export default function ProductGrid() {
 
         let query = supabase
           .from("products")
-          .select("id,name,price,image,rating,category_id,product_type_id,how_to_use,category");
+          .select("id,name,price,image,rating,category_id,product_type_id,how_to_use,category,review_count,click_count");
 
         if (category) query = query.eq("category", category);
         if (priceMin !== undefined) query = query.gte("price", priceMin);
@@ -49,6 +49,8 @@ export default function ProductGrid() {
           price: Number(r.price) || 0,
           image: r.image || "",
           rating: Number(r.rating ?? 0) || 0,
+          review_count: Number(r.review_count ?? 0) || 0,
+          click_count: Number(r.click_count ?? 0) || 0,
           skinType: r.skinType || "",
           keyIngredients: Array.isArray(r.keyIngredients) ? r.keyIngredients : [],
           benefits: Array.isArray(r.benefits) ? r.benefits : [],
@@ -86,7 +88,19 @@ export default function ProductGrid() {
       ) : null}
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((p) => (
-          <ProductCard key={p.id} product={{ id: p.id, name: p.name, price: p.price, image: p.image, rating: p.rating, category: p.category }} />
+          <ProductCard
+            key={p.id}
+            product={{
+              id: p.id,
+              name: p.name,
+              price: p.price,
+              image: p.image,
+              rating: p.rating,
+              category: p.category,
+              review_count: p.review_count,
+              click_count: p.click_count,
+            }}
+          />
         ))}
       </div>
     </div>
