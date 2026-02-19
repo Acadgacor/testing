@@ -22,10 +22,6 @@ export default function ProductCard({ product }: Props) {
     return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
   }
 
-  const rating = product.rating || 0;
-  const reviewCount = product.review_count || 0;
-  const clickCount = product.click_count || 0;
-
   return (
     <Card className="group relative flex flex-col bg-white border border-neutral-200 overflow-hidden rounded-lg hover:shadow-md transition-shadow duration-300">
       {/* Image Section */}
@@ -47,7 +43,7 @@ export default function ProductCard({ product }: Props) {
         {/* Product Name */}
         <Link
           href={`/products/${product.id}`}
-          className="line-clamp-2 text-sm text-neutral-800 leading-snug hover:text-brand-primary transition-colors"
+          className="line-clamp-2 min-h-[2.5rem] text-sm text-neutral-800 leading-snug hover:text-brand-primary transition-colors"
           title={product.name}
         >
           {product.name}
@@ -62,11 +58,11 @@ export default function ProductCard({ product }: Props) {
         <div className="flex items-center gap-1 text-[11px] text-neutral-500">
           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
           <span className="font-medium text-neutral-700">
-            {rating > 0 ? rating.toFixed(1) : "0.0"}
+            {product.rating && product.rating > 0 ? product.rating.toFixed(1) : "0.0"}
           </span>
-          <span className="text-neutral-400">({reviewCount})</span>
+          <span className="text-neutral-400">({product.review_count || 0})</span>
           <span className="text-neutral-300">•</span>
-          <span>{clickCount} Orang Minat</span>
+          <span>{product.click_count || 0} diminati</span>
         </div>
       </div>
     </Card>

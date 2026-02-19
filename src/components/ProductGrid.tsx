@@ -26,7 +26,7 @@ export default function ProductGrid() {
 
         let query = supabase
           .from("products")
-          .select("id,name,price,image,rating,category_id,product_type_id,how_to_use,category,review_count,click_count");
+          .select("id,name,price,image,rating,category_id,product_type_id,how_to_use,category,reviews(rating),outbound_clicks(id)");
 
         if (category) query = query.eq("category", category);
         if (priceMin !== undefined) query = query.gte("price", priceMin);
@@ -44,23 +44,23 @@ export default function ProductGrid() {
         const { data, error } = await query;
         if (error) throw error;
         const list: Product[] = (data || []).map((r: any) => {
-          // Calculate live rating and review count from reviews relation
+          // Calculate relational counts safely
           const reviews = r.reviews || [];
-          const totalRating = reviews.reduce((sum: number, rev: any) => sum + (rev.rating || 0), 0);
           const reviewCount = reviews.length;
-          const avgRating = reviewCount > 0 ? totalRating / reviewCount : 0;
+          const totalRating = reviews.reduce((sum: number, rev: any) => sum + (rev.rating || 0), 0);
+          const avgRating = reviewCount > 0 ? totalRating / reviewCount : (Number(r.rating) || 0);
 
-          // Get live click count from outbound_clicks relation
-          const clickCount = r.outbound_clicks?.[0]?.count || 0;
+          const clicks = r.outbound_clicks || [];
+          const clickCount = clicks.length;
 
           return {
             id: String(r.id),
             name: r.name,
             price: Number(r.price) || 0,
             image: r.image || "",
-            rating: Number(r.rating ?? 0) || 0,
-            review_count: Number(r.review_count) || 0,
-            click_count: Number(r.click_count) || 0,
+            rating: avgRating,
+            review_count: reviewCount,
+            click_count: clickCount,
             skinType: r.skinType || "",
             keyIngredients: Array.isArray(r.keyIngredients) ? r.keyIngredients : [],
             benefits: Array.isArray(r.benefits) ? r.benefits : [],
