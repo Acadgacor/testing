@@ -49,28 +49,4 @@ export default function AddToCartButton({ productId, url, platform, className, c
             setLoading(false);
         }
     }
-
-    return (
-        <button
-            onClick={handleAffiliateClick}
-            disabled={loading || !url}
-            className={`flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed ${className || "bg-brand-primary text-white px-4 py-2 rounded-lg"}`}
-        >
-            {loading ? (
-                <Loader2 className="animate-spin" size={18} />
-            ) : (
-                children || (
-                    <>
-                        <span>Beli Sekarang</span>
-                        <ExternalLink size={16} />
-                    </>
-                )
-            )}
-
-            <LoginAuthModal
-                isOpen={showLoginModal}
-                onClose={() => setShowLoginModal(false)}
-            />
-        </button>
-    );
 }

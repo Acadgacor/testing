@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useTransition, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import GoogleButton from "@/components/auth/GoogleButton";
-import { loginAction } from "@/actions/auth";
+import Button from "@/shared/ui/Button";
+import Input from "@/shared/ui/Input";
+import GoogleButton from "@/features/auth/components/GoogleButton";
+import { loginAction } from "@/features/auth/actions";
 import { safeDecode, toStr } from "@/lib/utils";
 
 export default function LoginForm() {

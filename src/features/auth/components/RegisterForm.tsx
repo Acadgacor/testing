@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useTransition, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
-import GoogleButton from "@/components/auth/GoogleButton";
-import { registerAction } from "@/actions/auth";
+import Input from "@/shared/ui/Input";
+import Button from "@/shared/ui/Button";
+import GoogleButton from "@/features/auth/components/GoogleButton";
+import { registerAction } from "@/features/auth/actions";
 import { safeDecode, toStr } from "@/lib/utils";
 
 export default function RegisterForm() {

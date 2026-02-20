@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import AuthCard from "@/components/auth/AuthCard";
-import RegisterForm from "@/components/auth/RegisterForm";
+import AuthCard from "@/features/auth/components/AuthCard";
+import RegisterForm from "@/features/auth/components/RegisterForm";
 import { redirectIfAuthenticated } from "@/lib/authHelpers";
 
 export default async function RegisterPage() {
