@@ -1,6 +1,6 @@
 "use server";
 import Stripe from "stripe";
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { getServerSupabase } from "@/shared/lib/supabaseServer";
 import { redirect } from "next/navigation";
 
 export async function createCheckoutSession() {

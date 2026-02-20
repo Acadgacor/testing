@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
 
 export type ChatContentPart = {
     type: "text";

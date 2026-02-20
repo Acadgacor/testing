@@ -6,7 +6,7 @@ import Badge from "@/shared/ui/Badge";
 import type { Product } from "@/features/products/types";
 import { useCartStore } from "@/features/cart/store";
 import { useCompareStore } from "@/store/compareStore";
-import { analyzeIngredients } from "@/lib/ingredientMatcher";
+import { analyzeIngredients } from "@/features/questionnaire/lib/ingredientMatcher";
 import type { UserProfile } from "@/types/user";
 
 type Props = {

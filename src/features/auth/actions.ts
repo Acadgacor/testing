@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 import { LoginSchema, RegisterSchema } from "./schemas";
 
 export async function loginAction(formData: FormData) {

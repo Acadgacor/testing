@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { useCartStore } from "@/features/cart/store";
 import { addToCart } from "@/features/cart/actions";
-import { trackOutboundClick } from "@/actions/tracking";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { trackOutboundClick } from "@/shared/lib/tracking";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
 import { Loader2, Minus, Plus, X, Check, Copy } from "lucide-react";
 import LoginAuthModal from "@/features/auth/components/LoginAuthModal";
 

@@ -7,7 +7,7 @@ import Button from "@/shared/ui/Button";
 import Input from "@/shared/ui/Input";
 import GoogleButton from "./GoogleButton";
 import { loginAction } from "../actions";
-import { safeDecode, toStr } from "@/lib/utils";
+import { safeDecode, toStr } from "@/shared/lib/utils";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();

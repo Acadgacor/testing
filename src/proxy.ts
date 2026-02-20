@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { getPublicEnvValidated } from "@/lib/publicEnv";
+import { getPublicEnvValidated } from "@/shared/lib/publicEnv";
 
 export async function proxy(req: NextRequest) {
   const res = NextResponse.next();

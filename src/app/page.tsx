@@ -2,7 +2,7 @@ import Hero from "@/shared/components/Hero";
 import Card from "@/shared/ui/Card";
 import Badge from "@/shared/ui/Badge";
 import ProductCard from "@/features/products/components/ProductCard";
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

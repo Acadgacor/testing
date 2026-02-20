@@ -4,7 +4,7 @@ import Input from "@/shared/ui/Input";
 import Button from "@/shared/ui/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
 
 export default function FilterBar() {
   const params = useSearchParams();

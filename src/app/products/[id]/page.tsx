@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { getServerSupabase } from "@/shared/lib/supabaseServer";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import MobileProductHeader from "@/features/products/components/MobileProductHea
 import ReviewForm from "@/features/reviews/components/ReviewForm";
 import ReviewList from "@/features/reviews/components/ReviewList";
 import { getProductRatingSummary } from "@/features/reviews/actions";
-import { getOutboundClickCount } from "@/actions/tracking";
+import { getOutboundClickCount } from "@/shared/lib/tracking";
 import type { Product } from "@/features/products/types";
 import type { Metadata, ResolvingMetadata } from "next";
 

@@ -3,7 +3,7 @@
 import Input from "@/shared/ui/Input";
 import Button from "@/shared/ui/Button";
 import AuthCard from "@/features/auth/components/AuthCard";
-import { safeDecode } from "@/lib/utils";
+import { safeDecode } from "@/shared/lib/utils";
 
 type ForgotPageProps = { searchParams: Promise<{ error?: string; info?: string }> };
 

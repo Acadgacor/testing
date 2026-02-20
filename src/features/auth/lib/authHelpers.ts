@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 
 // Use this to PROTECT pages (e.g. Dashboard)
 export async function requireUser() {

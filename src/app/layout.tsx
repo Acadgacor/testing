@@ -5,7 +5,7 @@ import Navbar from "@/shared/components/Navbar";
 import CompareBar from "@/components/CompareBar";
 import FooterWrapper from "@/shared/components/FooterWrapper";
 import ServiceWorkerRemover from "@/components/ServiceWorkerRemover";
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

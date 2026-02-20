@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Card from "@/shared/ui/Card";
-import type { Routine } from "@/lib/routineGenerator";
+import type { Routine } from "@/features/questionnaire/lib/routineGenerator";
 
 type Props = {
     routine: Routine;

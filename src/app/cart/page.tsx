@@ -3,7 +3,7 @@ import Button from "@/shared/ui/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/features/cart/store";
-import { generateRoutine } from "@/lib/routineGenerator";
+import { generateRoutine } from "@/features/questionnaire/lib/routineGenerator";
 import RoutineSuggestion from "@/components/RoutineSuggestion";
 import { useMemo, useState } from "react";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";

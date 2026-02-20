@@ -3,8 +3,8 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getSupabaseClient } from "@/lib/supabaseClient";
-import { formatContent } from "@/lib/formatText";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
+import { formatContent } from "@/shared/lib/formatText";
 
 export default function DiagnosisPage() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);

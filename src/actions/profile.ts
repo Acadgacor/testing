@@ -1,5 +1,5 @@
 "use server";
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 import { revalidatePath } from "next/cache";
 
 export async function updateProfile(formData: FormData) {

@@ -1,6 +1,6 @@
 "use server";
 
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 
 export async function trackOutboundClick(
     productId: string,

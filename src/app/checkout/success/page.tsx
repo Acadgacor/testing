@@ -1,4 +1,4 @@
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 
 export default async function SuccessPage() {
   const supabase = await getServerSupabaseRSC();

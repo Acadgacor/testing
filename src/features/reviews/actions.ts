@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
+import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 import { ReviewSchema } from "@/lib/schemas";
 
 export async function submitReview(_prevState: any, formData: FormData) {

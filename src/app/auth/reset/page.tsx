@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
 import Input from "@/shared/ui/Input";
 import Button from "@/shared/ui/Button";
 

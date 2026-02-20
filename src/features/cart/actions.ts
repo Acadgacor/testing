@@ -1,5 +1,5 @@
 "use server";
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { getServerSupabase } from "@/shared/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
 
 // Helper: Get existing Cart ID OR Create new Cart for LOGGED IN USER

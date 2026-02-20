@@ -3,8 +3,8 @@ import ProductComparison from "@/components/ProductComparison";
 import { useCompareStore } from "@/store/compareStore";
 import type { Product } from "@/features/products/types";
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseClient } from "@/lib/supabaseClient";
-import { getUserProfile } from "@/lib/ingredientMatcher";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
+import { getUserProfile } from "@/features/questionnaire/lib/ingredientMatcher";
 import type { UserProfile } from "@/types/user";
 
 export default function ComparePage() {

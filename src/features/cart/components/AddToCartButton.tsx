@@ -2,9 +2,9 @@
 "use client";
 
 import { useState } from "react";
-import { trackOutboundClick } from "@/actions/tracking";
+import { trackOutboundClick } from "@/shared/lib/tracking";
 import { Loader2, ExternalLink } from "lucide-react";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/shared/lib/supabaseClient";
 import LoginAuthModal from "@/features/auth/components/LoginAuthModal";
 
 type Props = {
