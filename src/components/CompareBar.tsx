@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useCompareStore } from '@/store/compareStore';
+import { useCompareStore } from '@/features/compare/store';
 
 export default function CompareBar() {
   const items = useCompareStore((s) => s.items);

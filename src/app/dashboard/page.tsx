@@ -3,7 +3,7 @@ import { User } from "lucide-react";
 import { getServerSupabaseRSC } from "@/shared/lib/supabaseServerRSC";
 import Card from "@/shared/ui/Card";
 import Button from "@/shared/ui/Button";
-import { updateProfile } from "@/actions/profile";
+import { updateProfile } from "@/features/profile/actions";
 import SkinProfilePanel from "@/components/SkinProfilePanel";
 import LogoutButton from "@/features/auth/components/LogoutButton";
 import { requireUser } from "@/features/auth/lib/authHelpers";

@@ -5,7 +5,7 @@ import Button from "@/shared/ui/Button";
 import Badge from "@/shared/ui/Badge";
 import type { Product } from "@/features/products/types";
 import { useCartStore } from "@/features/cart/store";
-import { useCompareStore } from "@/store/compareStore";
+import { useCompareStore } from "@/features/compare/store";
 import { analyzeIngredients } from "@/features/questionnaire/lib/ingredientMatcher";
 import type { UserProfile } from "@/types/user";
 
