@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
-import { submitReview } from "@/actions/reviews";
+import { submitReview } from "../actions";
 import Button from "@/shared/ui/Button";
 
 type ReviewFormProps = {

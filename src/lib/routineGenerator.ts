@@ -1,4 +1,4 @@
-import { CartItem } from "@/store/cartStore";
+import { CartItem } from "@/features/cart/store";
 
 export type RoutineStep = {
     step: number;

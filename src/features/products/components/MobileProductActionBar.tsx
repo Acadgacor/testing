@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useCartStore } from "@/store/cartStore";
-import { addToCart } from "@/actions/cart";
+import { useCartStore } from "@/features/cart/store";
+import { addToCart } from "@/features/cart/actions";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import LoginAuthModal from "@/features/auth/components/LoginAuthModal";

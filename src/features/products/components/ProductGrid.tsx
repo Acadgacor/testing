@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "./ProductCard";
 import { getSupabaseClient } from "@/lib/supabaseClient";
-import type { Product } from "@/types/product";
+import type { Product } from "../types";
 
 export default function ProductGrid() {
   const params = useSearchParams();

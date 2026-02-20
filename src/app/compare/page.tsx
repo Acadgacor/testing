@@ -1,7 +1,7 @@
 "use client";
 import ProductComparison from "@/components/ProductComparison";
 import { useCompareStore } from "@/store/compareStore";
-import type { Product } from "@/types/product";
+import type { Product } from "@/features/products/types";
 import { useEffect, useMemo, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import { getUserProfile } from "@/lib/ingredientMatcher";

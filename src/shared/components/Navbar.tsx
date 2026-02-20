@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { useCartStore } from "@/store/cartStore";
-import { getCartItems } from "@/actions/cart";
+import { useCartStore } from "@/features/cart/store";
+import { getCartItems } from "@/features/cart/actions";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },

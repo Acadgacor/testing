@@ -1,7 +1,7 @@
-import Hero from "@/components/Hero";
+import Hero from "@/shared/components/Hero";
 import Card from "@/shared/ui/Card";
 import Badge from "@/shared/ui/Badge";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/features/products/components/ProductCard";
 import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
 
 export const dynamic = "force-dynamic";

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import FilterBar from "@/components/FilterBar";
-import ProductGrid from "@/components/ProductGrid";
+import FilterBar from "@/features/products/components/FilterBar";
+import ProductGrid from "@/features/products/components/ProductGrid";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

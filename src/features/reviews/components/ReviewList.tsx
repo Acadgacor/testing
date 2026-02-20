@@ -1,5 +1,5 @@
 import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
-import type { Review } from "@/types/product";
+import type { Review } from "@/features/products/types";
 
 function StarRow({ value }: { value: number }) {
   return (

@@ -1,7 +1,6 @@
 import { ChatMessage } from "@/hooks/useSkinChat";
 import { formatContent } from "@/lib/formatText";
 import Image from "next/image";
-
 interface ChatBubbleProps {
     message: ChatMessage;
 }

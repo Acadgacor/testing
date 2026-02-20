@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Share2, ShoppingCart, Menu as MenuIcon, X, Copy, Mail, MoreHorizontal, MessageSquare, Check } from "lucide-react";
-import { useCartStore } from "@/store/cartStore";
+import { useCartStore } from "@/features/cart/store";
 import type { User } from "@supabase/supabase-js";
 import Image from "next/image";
 

@@ -2,12 +2,12 @@
 import Button from "@/shared/ui/Button";
 import Link from "next/link";
 import Image from "next/image";
-import { useCartStore } from "@/store/cartStore";
+import { useCartStore } from "@/features/cart/store";
 import { generateRoutine } from "@/lib/routineGenerator";
 import RoutineSuggestion from "@/components/RoutineSuggestion";
 import { useMemo, useState } from "react";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
-import { clearCart } from "@/actions/cart";
+import { clearCart } from "@/features/cart/actions";
 
 function formatRp(n: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { useCartStore } from "@/store/cartStore";
-import { addToCart } from "@/actions/cart";
+import { useCartStore } from "@/features/cart/store";
+import { addToCart } from "@/features/cart/actions";
 import { trackOutboundClick } from "@/actions/tracking";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import { Loader2, Minus, Plus, X, Check, Copy } from "lucide-react";

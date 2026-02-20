@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/shared/components/Navbar";
 import CompareBar from "@/components/CompareBar";
-import FooterWrapper from "@/components/FooterWrapper";
+import FooterWrapper from "@/shared/components/FooterWrapper";
 import ServiceWorkerRemover from "@/components/ServiceWorkerRemover";
 import { getServerSupabaseRSC } from "@/lib/supabaseServerRSC";
 

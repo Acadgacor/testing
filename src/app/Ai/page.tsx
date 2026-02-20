@@ -1,8 +1,8 @@
 "use client";
 
 import { useSkinChat } from "@/hooks/useSkinChat";
-import ChatBubble from "@/components/chat/ChatBubble";
-import ChatInput from "@/components/chat/ChatInput";
+import ChatBubble from "@/features/chat/components/ChatBubble";
+import ChatInput from "@/features/chat/components/ChatInput";
 import Image from "next/image";
 
 const starterPrompts = [

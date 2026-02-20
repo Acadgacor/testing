@@ -3,7 +3,7 @@ import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { processSkinAnalysis } from "@/lib/services/aiService";
+import { processSkinAnalysis } from "@/features/chat/services/aiService";
 
 // Schema Validation
 const contentSchema = z.union([
