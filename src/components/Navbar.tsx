@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCartStore } from "@/store/cartStore";
+import { getCartItems } from "@/actions/cart";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
@@ -27,6 +28,7 @@ export default function Navbar({ user }: NavbarProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const count = useCartStore((s) => s.items.reduce((sum, i) => sum + i.qty, 0));
+  const setItems = useCartStore((s) => s.setItems);
   const userInitial = user?.email?.[0]?.toUpperCase() ?? "";
 
   useEffect(() => {
@@ -34,6 +36,20 @@ export default function Navbar({ user }: NavbarProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    const syncCart = async () => {
+      if (user) {
+        try {
+          const items = await getCartItems();
+          setItems(items);
+        } catch (error) {
+          console.error("Failed to sync cart on mount:", error);
+        }
+      }
+    };
+    syncCart();
+  }, [user, setItems]);
 
   const pathname = usePathname();
   const isProductDetailPage = pathname?.startsWith("/products/") && pathname.split("/").length > 2;

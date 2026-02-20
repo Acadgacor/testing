@@ -17,10 +17,12 @@ type State = {
   remove: (id: string) => void;
   update: (id: string, qty: number) => void;
   clear: () => void;
+  setItems: (items: CartItem[]) => void;
 };
 
 export const useCartStore = create<State>((set, get) => ({
   items: [],
+  setItems: (items) => set({ items }),
   add: (p, qty = 1) =>
     set((s) => {
       const i = s.items.findIndex((it) => it.id === p.id);

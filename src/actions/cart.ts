@@ -53,15 +53,15 @@ export async function addToCart(formData: FormData) {
 
   const { data: existing } = await supabase
     .from("cart_items")
-    .select("id,qty")
+    .select("id,quantity")
     .eq("cart_id", cartId)
     .eq("product_id", productId)
     .maybeSingle();
 
   if (existing) {
-    await supabase.from("cart_items").update({ qty: existing.qty + qty }).eq("id", existing.id);
+    await supabase.from("cart_items").update({ quantity: existing.quantity + qty }).eq("id", existing.id);
   } else {
-    await supabase.from("cart_items").insert({ cart_id: cartId, product_id: productId, qty });
+    await supabase.from("cart_items").insert({ cart_id: cartId, product_id: productId, quantity: qty });
   }
 
   revalidatePath("/cart");
@@ -76,7 +76,7 @@ export async function updateCartItem(formData: FormData) {
   }
 
   const supabase = await getServerSupabase();
-  await supabase.from("cart_items").update({ qty }).eq("id", itemId);
+  await supabase.from("cart_items").update({ quantity: qty }).eq("id", itemId);
   revalidatePath("/cart");
 }
 
@@ -100,4 +100,44 @@ export async function clearCart() {
     await supabase.from("cart_items").delete().eq("cart_id", cartId);
     revalidatePath("/cart");
   }
+}
+
+export async function getCartItems() {
+  const supabase = await getServerSupabase();
+  const { data: userRes } = await supabase.auth.getUser();
+  const user = userRes?.user;
+
+  if (!user) return [];
+
+  const cartId = await getOrCreateCartId(supabase, user.id);
+
+  const { data: items, error } = await supabase
+    .from("cart_items")
+    .select(`
+      quantity,
+      product_id,
+      products (
+        id,
+        name,
+        price,
+        image,
+        category
+      )
+    `)
+    .eq("cart_id", cartId);
+
+  if (error || !items) {
+    console.error("Failed to fetch cart items:", error);
+    return [];
+  }
+
+  // Format the result to match the Zustand CartItem type
+  return items.map((item: any) => ({
+    id: item.product_id,
+    name: item.products?.name || "Unknown Product",
+    price: item.products?.price || 0,
+    image: item.products?.image || "",
+    category: item.products?.category || "",
+    qty: item.quantity,
+  }));
 }
