@@ -71,7 +71,6 @@ export default async function ProductDetailPage({ params }: Params) {
       skin_type: String(answers["q1_sebum_after_wash"] || ""),
       skin_concerns: answers["q12_skin_concerns"] || [],
     };
-    console.log("Mapped User Profile for AI:", userProfile);
   }
 
   const { data } = await supabase

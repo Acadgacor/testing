@@ -77,9 +77,6 @@ export function analyzeIngredients(ingredients?: string[] | null, userProfile?: 
         (highlightsFound.has('✨ Salicylic Acid') || highlightsFound.has('🌿 Centella Asiatica'))) {
         badges.push({ label: '✨ Cocok untuk meredakan Jerawat Anda', status: 'highlight' });
     }
-
-    // Add negative badges (Peringatan)
-    // Add negative badges (Peringatan)
     if (hasAlcohol) {
         // Pake .toLowerCase() biar aman dari huruf besar/kecil
         if (userProfile?.skin_type?.toLowerCase().includes('kering')) {

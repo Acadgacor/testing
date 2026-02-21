@@ -1,26 +1,29 @@
 import { create } from "zustand";
-
-export type CompareItem = {
-  id: string;
-  name: string;
-  image: string;
-};
+import { persist, createJSONStorage } from "zustand/middleware";
+import type { Product } from "@/features/products/types";
 
 type State = {
-  items: CompareItem[];
-  add: (item: CompareItem) => void;
+  items: Product[];
+  add: (item: Product) => void;
   remove: (id: string) => void;
   clear: () => void;
 };
 
-export const useCompareStore = create<State>((set) => ({
-  items: [],
-  add: (item) => set((s) => {
-    const exists = s.items.some((i) => i.id === item.id);
-    const next = exists ? s.items : [...s.items.slice(-2), item];
-    return { items: next };
-  }),
-  remove: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),
-  clear: () => set({ items: [] }),
-}));
-
+export const useCompareStore = create<State>()(
+  persist(
+    (set) => ({
+      items: [],
+      add: (item) => set((s) => {
+        const exists = s.items.some((i) => i.id === item.id);
+        const next = exists ? s.items : [...s.items, item].slice(-3);
+        return { items: next };
+      }),
+      remove: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),
+      clear: () => set({ items: [] }),
+    }),
+    {
+      name: "compare-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
