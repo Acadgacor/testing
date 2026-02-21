@@ -7,7 +7,6 @@ import ProductPurchaseCard from "@/features/products/components/ProductPurchaseC
 import ReviewForm from "@/features/reviews/components/ReviewForm";
 import ReviewList from "@/features/reviews/components/ReviewList";
 import type { Product } from "@/features/products/types";
-import { analyzeIngredients } from "@/features/products/lib/ingredientAnalyzer";
 import CompareButton from "@/features/compare/components/CompareButton";
 
 export interface ProductDetailDesktopProps {
@@ -128,34 +127,18 @@ export default function ProductDetailDesktop({
                                     )}
                                 </div>
 
-                                {/* Analisa Kandungan */}
+                                {/* Komposisi Produk */}
                                 <div className="pt-4 border-t border-neutral-100 mt-2 lg:border-none lg:mt-0 lg:pt-2">
-                                    <h4 className="font-bold text-brand-dark text-base mb-3">Analisa Kandungan</h4>
+                                    <h4 className="font-bold text-brand-dark text-base mb-3">Komposisi Produk</h4>
                                     {(!product.ingredients || product.ingredients.length === 0) ? (
                                         <p className="text-sm text-neutral-500 italic">Data kandungan belum tersedia.</p>
                                     ) : (
-                                        <div className="space-y-4">
-                                            <div className="flex flex-wrap gap-2">
-                                                {analyzeIngredients(product.ingredients).map((badge, idx) => {
-                                                    let badgeClass = "";
-                                                    if (badge.status === 'negative') badgeClass = "bg-rose-50 text-rose-700 border-rose-200 font-medium";
-                                                    else if (badge.status === 'positive') badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200 font-medium";
-                                                    else if (badge.status === 'highlight') badgeClass = "bg-purple-50 text-purple-700 border-purple-200 font-medium";
-                                                    else badgeClass = "bg-neutral-50 text-neutral-700 border-neutral-200 font-medium";
-
-                                                    return (
-                                                        <Badge key={idx} variant="outline" className={badgeClass}>
-                                                            {badge.label}
-                                                        </Badge>
-                                                    );
-                                                })}
-                                            </div>
-                                            <div className="pt-1">
-                                                <h5 className="font-semibold text-neutral-700 text-xs mb-1 uppercase tracking-wider">Komposisi Lengkap</h5>
-                                                <p className="text-sm text-neutral-500 leading-relaxed">
-                                                    {product.ingredients.join(', ')}
-                                                </p>
-                                            </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {product.ingredients.map((ing, i) => (
+                                                <Badge key={i} variant="outline" className="bg-neutral-50 border-neutral-200 text-neutral-600">
+                                                    {ing}
+                                                </Badge>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
