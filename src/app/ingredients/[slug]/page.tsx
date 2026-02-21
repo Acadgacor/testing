@@ -3,10 +3,43 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ProductCard from "@/features/products/components/ProductCard";
 import { ArrowLeft, ShieldCheck, Sparkles, AlertTriangle, Info } from "lucide-react";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+    const { slug } = await params;
+    const supabase = await getServerSupabase();
+
+    const { data: ingredient } = await supabase
+        .from("ingredients")
+        .select("name, description")
+        .eq("slug", slug)
+        .single();
+
+    if (!ingredient) {
+        return {
+            title: "Kandungan Tidak Ditemukan | Kamus Skincare Beaulytics",
+        };
+    }
+
+    const title = `${ingredient.name}: Manfaat & Keamanan | Kamus Skincare Beaulytics`;
+    const description = ingredient.description
+        ? ingredient.description.substring(0, 150)
+        : `Pelajari manfaat, tingkat keamanan, dan fungsi dari ${ingredient.name} untuk kulit Anda.`;
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: "article",
+        },
+    };
+}
 
 export default async function IngredientDetailPage({ params }: Params) {
     const { slug } = await params;
