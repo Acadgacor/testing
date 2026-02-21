@@ -20,6 +20,10 @@ function formatRp(n: number) {
 
 export default function ProductComparison({ products, userProfile }: Props) {
   const [mounted, setMounted] = useState(false);
+
+  // LOG DEBUGGER: Untuk mengecek apakah data profil berhasil sampai ke Client
+  console.log("Data Profil untuk AI di Halaman Compare:", userProfile);
+
   const storeItems = useCompareStore((s) => s.items);
   const items = products && products.length > 0 ? products : storeItems;
   const removeFromCompare = useCompareStore((s) => s.remove);
@@ -122,7 +126,7 @@ export default function ProductComparison({ products, userProfile }: Props) {
 
                         <div className="mt-6 w-full">
                           <Button
-                            className="w-full text-sm py-3 rounded-xl font-semibold bg-brand-primary text-white hover:bg-neutral-800 transition-colors shadow-sm"
+                            className="w-full text-sm py-3 rounded-xl font-semibold bg-brand-primary text-white hover:bg-yellow-600 transition-colors shadow-sm"
                             onClick={() => addToCart({ id: p.id, name: p.name, price: p.price, image: p.image, category: p.category, ingredients: p.ingredients })}
                           >
                             Masukkan Keranjang
