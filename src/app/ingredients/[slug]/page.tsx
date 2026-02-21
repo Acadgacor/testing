@@ -27,7 +27,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
     const title = `${ingredient.name}: Manfaat & Keamanan | Kamus Skincare Beaulytics`;
     const description = ingredient.description
-        ? ingredient.description.substring(0, 150)
+        ? ingredient.description.length > 160
+            ? ingredient.description.substring(0, 160) + "..."
+            : ingredient.description
         : `Pelajari manfaat, tingkat keamanan, dan fungsi dari ${ingredient.name} untuk kulit Anda.`;
 
     return {
